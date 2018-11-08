@@ -56,6 +56,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <None Include="app.config" />
     <None Include="World\CraftItems\ManaLamp.json" />
     <None Include="meta.json" />
     <None Include="newgui\sheets.json" />

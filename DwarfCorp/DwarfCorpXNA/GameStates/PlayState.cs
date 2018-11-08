@@ -43,7 +43,9 @@ namespace DwarfCorp.GameStates
         private Gui.Widget LevelLabel;
         private Gui.Widget StocksLabel;
         private Gui.Widgets.FlatToolTray.RootTray BottomToolBar;
+        private Gui.Widgets.FlatToolTray.RootTray BuildBar;
         private Gui.Widgets.FlatToolTray.Tray MainMenu;
+        private Gui.Widgets.FlatToolTray.Tray buildTray;
         private Gui.Widget TimeLabel;
         private Gui.Widget PausePanel;
         private MinimapFrame MinimapFrame;
@@ -586,7 +588,7 @@ namespace DwarfCorp.GameStates
                 Background = new TileReference("basic", 0),
                 BackgroundColor = new Vector4(0, 0, 0, 0.5f),
                 Padding = new Margin(0, 0, 2, 2),
-                MinimumSize = new Point(0, 36),
+                MinimumSize = new Point(0, 24),
                 AutoLayout = AutoLayout.DockBottom
             });
 
@@ -598,6 +600,25 @@ namespace DwarfCorp.GameStates
                 InteriorMargin = new Margin(2,0,0,0),
                 Padding = new Margin(0,0,2,2)
             });
+
+            var controlsBar = GuiRoot.RootItem.AddChild(new Widget
+            {
+                Transparent = true,
+                MinimumSize = new Point(500, 64),
+                AutoLayout = AutoLayout.FloatBottomRight,
+                InteriorMargin = new Margin(2, 0, 0, 0),
+                Padding = new Margin(0, 0, 0, 2)
+            });
+            
+            var buildBarLocation = GuiRoot.RootItem.AddChild(new Widget
+            {
+                Transparent = true,
+                MinimumSize = new Point(550, 64),
+                AutoLayout = AutoLayout.FloatBottomLeft,
+                InteriorMargin = new Margin(2, 0, 0, 0),
+                Padding = new Margin(0, 0, 20, 0)
+            });
+
 
             #region Setup company information section
             BottomBar.AddChild(new CompanyLogo
@@ -708,8 +729,9 @@ namespace DwarfCorp.GameStates
             {
                 Tag = "minimap",
                 Renderer = MinimapRenderer,
-                AutoLayout = AutoLayout.FloatBottomLeft,
-                MinimumSize = new Point(208, 204),
+                AutoLayout = AutoLayout.FloatTopRight,
+                MinimumSize = new Point(258, 254),
+                Padding = new Margin(50, 0, 0, 50),
                 OnLayout = (sender) => sender.Rect.Y += 4
             }) as MinimapFrame;
 
@@ -720,7 +742,7 @@ namespace DwarfCorp.GameStates
                 Employee = null,
                 EnablePosession = true,
                 Tag = "selected-employee-info",
-                AutoLayout = AutoLayout.FloatBottomLeft,
+                AutoLayout = AutoLayout.FloatTopRight,
                 MinimumSize = new Point(450, 500 - (50 * (GameSettings.Default.GuiScale - 1))),
                 OnFireClicked = (sender) =>
                 {
@@ -765,14 +787,14 @@ namespace DwarfCorp.GameStates
                 DesignationSet = World.PlayerFaction.Designations,
                 Hidden = true,
                 Border = "border-fancy",
-                AutoLayout = AutoLayout.FloatBottomLeft,
+                AutoLayout = AutoLayout.FloatTopRight,
                 MinimumSize = new Point(300, 200)
             });
 
             var taskList = GuiRoot.RootItem.AddChild(new TaskListPanel
             {
                 Border = "border-thin",
-                AutoLayout = AutoLayout.FloatBottomLeft,
+                AutoLayout = AutoLayout.FloatTopRight,
                 MinimumSize = new Point(600, 300),
                 Hidden = true,
                 World = this.World
@@ -781,7 +803,7 @@ namespace DwarfCorp.GameStates
             var roomList = GuiRoot.RootItem.AddChild(new RoomListPanel
             {
                 Border = "border-thin",
-                AutoLayout = AutoLayout.FloatBottomLeft,
+                AutoLayout = AutoLayout.FloatTopRight,
                 MinimumSize = new Point(600, 300),
                 Hidden = true,
                 World = this.World
@@ -809,11 +831,13 @@ namespace DwarfCorp.GameStates
                 }
             };
 
-            var bottomLeft = secondBar.AddChild(new Gui.Widgets.IconTray
+            var bottomLeft = GuiRoot.RootItem.AddChild(new Gui.Widgets.IconTray
             {
                 Corners = 0,
+                MinimumSize = new Point(200, 0),
+                Padding = new Margin(50, 50, 50, 50),
                 Transparent = true,
-                AutoLayout = Gui.AutoLayout.DockLeft,
+                AutoLayout = Gui.AutoLayout.FloatTopRight,
                 SizeToGrid = new Point(5, 1),
                 ItemSource = new Gui.Widget[]
                         {
@@ -2288,7 +2312,7 @@ namespace DwarfCorp.GameStates
                 ItemSource = new Gui.Widget[]
                 {
                     icon_SelectTool,
-                    icon_BuildTool,
+                    //icon_BuildTool,
                     icon_CookTool,
                     icon_DigTool,
                     icon_GatherTool,
@@ -2303,18 +2327,41 @@ namespace DwarfCorp.GameStates
                 Tag = "tools"
             };
 
+            buildTray = new FlatToolTray.Tray
+            {
+                ItemSource = new Gui.Widget[]
+                {
+                    icon_moveObjects,
+                    icon_destroyObjects,
+                    icon_BuildRoom,
+                    icon_BuildWall,
+                    icon_BuildFloor,
+                    icon_BuildCraft,
+                    icon_BuildResource,
+                    icon_RailTool,
+                },
+                Tag = "build"
+            };
+
             icon_menu_BuildTools_Return.ReplacementMenu = MainMenu;
             icon_menu_Edibles_Return.ReplacementMenu = MainMenu;
             icon_menu_Farm_Return.ReplacementMenu = MainMenu;
             //icon_menu_Magic_Return.ReplacementMenu = MainMenu;
             icon_menu_Plant_Return.ReplacementMenu = MainMenu;
 
-            BottomToolBar = secondBar.AddChild(new FlatToolTray.RootTray
+            BuildBar = buildBarLocation.AddChild(new FlatToolTray.RootTray
+            {
+                AutoLayout = AutoLayout.DockFill,
+            }) as FlatToolTray.RootTray;
+
+            BuildBar.SwitchTray(buildTray);
+
+            BottomToolBar = controlsBar.AddChild(new FlatToolTray.RootTray
             {
                 AutoLayout = AutoLayout.DockFill,
                 ItemSource = new Widget[]
                 {
-                    menu_BuildTools,
+                    //menu_BuildTools,
                     //menu_CastSpells,
                     menu_CraftTypes,
                     menu_Edibles,
@@ -2337,6 +2384,7 @@ namespace DwarfCorp.GameStates
             }) as FlatToolTray.RootTray;
 
             BottomToolBar.SwitchTray(MainMenu);
+
             ChangeTool(GameMaster.ToolMode.SelectUnits);
 
             #endregion
